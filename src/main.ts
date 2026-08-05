@@ -1,10 +1,10 @@
-import { NestFactory } from '@nestjs/core'
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
-import { AppModule } from './app.module'
-import { ValidationPipe } from '@nestjs/common'
+import { NestFactory } from '@nestjs/core';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { AppModule } from './app.module';
+import { ValidationPipe } from '@nestjs/common';
 
 async function sardor() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
     .setTitle('Users example')
@@ -12,14 +12,14 @@ async function sardor() {
     .addBearerAuth()
     .setVersion('1.0')
     .addTag('users')
-    .build()
-  const documentFactory = () => SwaggerModule.createDocument(app, config)
-  SwaggerModule.setup('sardor', app, documentFactory)
+    .build();
+  const documentFactory = () => SwaggerModule.createDocument(app, config);
+  SwaggerModule.setup('sardor', app, documentFactory);
 
-  app.useGlobalPipes(new ValidationPipe 
-    ({ whitelist: true,
-      forbidNonWhitelisted: true }))
+  app.useGlobalPipes(
+    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+  );
 
-  await app.listen(3000)
+  await app.listen(3000);
 }
-sardor()
+void sardor();

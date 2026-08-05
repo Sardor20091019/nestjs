@@ -1,21 +1,14 @@
-/* eslint-disable prettier/prettier */
-import knex from 'knex'
-import { config } from '../config/config'
+import knex from 'knex';
+import 'dotenv/config';
 
 export const db1 = knex({
   client: 'pg',
   connection: {
-    connectionString: config.DATABASE_URL,
-    host: config.DB_HOST,
-    port: Number(config.DB_PORT),
-    user: config.DB_USER,
-    database: config.DB_NAME,
-    password: config.DB_PASSWORD,
-    ssl: config.DB_SSL ? { rejectUnauthorized: false } : false,
+    connectionString: process.env.DATABASE_URL,
   },
   pool: {
     min: 2,
     max: 10,
   },
-})
-export const db2 = db1
+});
+export const db2 = db1;

@@ -10,7 +10,6 @@ import {
 import { Reflector } from '@nestjs/core';
 import { RoleEnum } from '../enum/role.enum';
 import { ROLES_METADATA_KEY } from '../decorator/roles.decorator';
-
 @Injectable()
 export class RolesGuard implements CanActivate {
   private readonly logger = new Logger(RolesGuard.name);
@@ -39,5 +38,42 @@ export class RolesGuard implements CanActivate {
       );
     }
     return true;
+  }
+}
+
+@Injectable()
+export class CheckIfAdminOrAccessingTheIrOwnInfoGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+
+    if (!user) {
+      throw new ForbiddenException('User not authenticated');
+    }
+
+    const userRole = user.role ? String(user.role).toLowerCase() : '';
+    const adminRole = String(RoleEnum.Admin).toLowerCase();
+
+    if (userRole === adminRole) {
+      return true;
+    }
+
+    const userId = user.id !== undefined ? user.id : user.userId;
+    const targetId =
+      request.params.id !== undefined
+        ? request.params.id
+        : request.params.userId;
+
+    if (
+      userId !== undefined &&
+      targetId !== undefined &&
+      String(userId) === String(targetId)
+    ) {
+      return true;
+    }
+
+    throw new ForbiddenException(
+      'You either not admin or not modifying your own information as user',
+    );
   }
 }

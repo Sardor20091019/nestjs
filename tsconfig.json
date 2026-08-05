@@ -26,7 +26,8 @@
     "src/**/*.ts",
     "src/**/*.js",
     "src/**/*.json",
-    "src/**/*.d.ts"
+    "src/**/*.d.ts",
+    "migrations/**/*.ts",
   ],
   "exclude": ["node_modules", "dist"]
 }

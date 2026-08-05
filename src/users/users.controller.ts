@@ -1,63 +1,69 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable prettier/prettier */
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common'
-import { UsersService } from './users.service'
-import { CreateUserDto } from './dto/create-user.dto'
-import { UpdateUserDto } from './dto/update-user.dto'
-import { JwtAuthGuard } from '../auth/jwt-auth.guard'
-import { RolesGuard } from '../auth/guard/roles.guard'
-import { RequiredRoles } from '../auth/decorator/roles.decorator'
-import { RoleEnum } from '../auth/enum/role.enum'
-import { ApiBearerAuth, ApiBody, ApiQuery } from '@nestjs/swagger'
-import { CurrentUser } from './dto/user.decorator'
-
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { Controller, Body, Param, UseGuards, Post, Req } from '@nestjs/common';
+import { UsersService } from './users.service';
+import { UpdateUserDto } from './dto/update-user.dto';
+import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { RolesGuard } from '../auth/guard/roles.guard';
+import { RequiredRoles } from '../auth/decorator/roles.decorator';
+import { RoleEnum } from '../auth/enum/role.enum';
+import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
+import { CheckIfAdminOrAccessingTheIrOwnInfoGuard } from '../auth/guard/roles.guard';
+import { PaginationDto } from './dto/pagination.dto';
 @Controller('users')
-@UseGuards(JwtAuthGuard, RolesGuard) 
+@UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  @ApiBody({ type: CreateUserDto })
-  create(@Body() createUserDto: CreateUserDto, @CurrentUser() user: any) {
-    createUserDto.role = user.role
-    return this.usersService.create(createUserDto)
+  @Post('users-list')
+  @ApiBody({ type: PaginationDto })
+  findAll(@Body() pagiantionDto: PaginationDto) {
+    return this.usersService.findAll(pagiantionDto.page, pagiantionDto.limit);
   }
 
   @RequiredRoles(RoleEnum.Admin)
-  @Get() 
-  @ApiQuery({ name: 'page', example: 1 })
-  @ApiQuery({ name: 'limit', example: 10 })
-  findAll(
-    @Query('page') page: string = '1',
-    @Query('limit') limit: string = '10',
+  @Post('set-role')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'number', example: 1 },
+        role: { type: 'string', enum: Object.values(RoleEnum) },
+      },
+    },
+  })
+  updateRole(@Body() body: { id: number; role: string }) {
+    return this.usersService.updateRole(body);
+  }
+
+  @Post('find-by-id')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        id: { type: 'number', example: 1 },
+      },
+    },
+  })
+  findOne(@Body() body: { id: number }) {
+    return this.usersService.findOne(Number(body.id));
+  }
+
+  @Post('update/:id')
+  @UseGuards(JwtAuthGuard, CheckIfAdminOrAccessingTheIrOwnInfoGuard)
+  update(
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+    @Req() req: any,
   ) {
-    const pageNumber = parseInt(page, 10)
-    const limitNumber = parseInt(limit, 10)
-
-    return this.usersService.findAll(pageNumber, limitNumber)
-  } 
-@Patch(':id/role')
-@ApiBody({ schema: { type: 'object', properties: { role: { type: 'string', enum: Object.values(RoleEnum) } } } })
-  updateRole(@Param('id') id: string, @Body('role') role: string) {
-    return this.usersService.updateRole(+id, role)
-  }
-  @Get(':id')
-  @RequiredRoles(RoleEnum.Admin, RoleEnum.User)
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id)
+    const requestingUser = req.user;
+    return this.usersService.update(+id, updateUserDto, requestingUser);
   }
 
-  @Patch(':id')
-  @RequiredRoles(RoleEnum.Admin)
-  update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.update(+id, updateUserDto)
-  }
-
-  @Delete(':id')
+  @Post('remove/:id')
   @RequiredRoles(RoleEnum.Admin)
   remove(@Param('id') id: string) {
-    return this.usersService.remove(+id)
+    return this.usersService.remove(+id);
   }
 }

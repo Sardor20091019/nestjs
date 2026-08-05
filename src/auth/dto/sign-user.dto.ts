@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
-import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
-import { RoleEnum } from '../enum/role.enum';
+import { IsString, IsNotEmpty } from 'class-validator';
+
 
 export class CreateUserDto {  
   @IsString()
@@ -10,8 +10,4 @@ export class CreateUserDto {
   @IsString()
   @IsNotEmpty()
   password!: string;
-
-  @IsString()
-  @IsOptional()
-  role?: RoleEnum;
 }
