@@ -6,15 +6,9 @@
   "private": true,
   "license": "UNLICENSED",
   "scripts": {
-<<<<<<< HEAD
     "knex": "knex --knexfile knexfile.ts",
     "knex:migrate": "knex --knexfile knexfile.ts migrate:latest",
     "knex:make": "knex --knexfile knexfile.ts migrate:make -x ts",
-=======
-  "knex": "knex --knexfile knexfile.ts",
-  "knex:migrate": "knex --knexfile knexfile.ts migrate:latest",
-  "knex:make": "knex --knexfile knexfile.ts migrate:make -x ts",
->>>>>>> 92569bd25d8bd5f8b9d7991a39458dce374ae539
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",

@@ -10,13 +10,8 @@ import { UpdateUserDto } from './dto/update-user.dto'
 export class UserRepo {
   private tableName = 'users'
 
-<<<<<<< HEAD
   async selectByUsername(username: string) {
     const user = await db1(this.tableName).where({ username }).first()
-=======
-  async selectByEmail(email: string) {
-    const user = await db1(this.tableName).where({ email }).first()
->>>>>>> 92569bd25d8bd5f8b9d7991a39458dce374ae539
     return user || null
   }
 
@@ -43,7 +38,6 @@ export class UserRepo {
     }
   }
   
-<<<<<<< HEAD
   async updateRole(id: number, role: string) {
     const [updatedUser] = await db1(this.tableName)
       .where({ id })
@@ -52,8 +46,6 @@ export class UserRepo {
     return updatedUser || null
   }
 
-=======
->>>>>>> 92569bd25d8bd5f8b9d7991a39458dce374ae539
   async findOne(id: number) {
     const user = await db1(this.tableName).where({ id }).first()
     return user || null

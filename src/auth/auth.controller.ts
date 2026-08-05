@@ -1,9 +1,5 @@
 /* eslint-disable prettier/prettier */
-<<<<<<< HEAD
 import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common'
-=======
-import { Controller, Post, Body } from '@nestjs/common'
->>>>>>> 92569bd25d8bd5f8b9d7991a39458dce374ae539
 import { AuthService } from './auth.service'
 import { CreateUserDto } from './dto/sign-user.dto'
 
@@ -11,7 +7,6 @@ import { CreateUserDto } from './dto/sign-user.dto'
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-<<<<<<< HEAD
   @Post('register')
   async register(@Body() createUserDto: CreateUserDto) {
     return this.authService.register(createUserDto)
@@ -26,10 +21,5 @@ export class AuthController {
     }
 
     return this.authService.login(user)
-=======
-  @Post('login')
-  login(@Body() body: CreateUserDto) {
-    return this.authService.login(body)
->>>>>>> 92569bd25d8bd5f8b9d7991a39458dce374ae539
   }
 }

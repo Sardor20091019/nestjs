@@ -1,12 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable prettier/prettier */
-i
-<<<<<<< HEAD
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query } from '@nestjs/common'
-=======
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Query,} from '@nestjs/common'
->>>>>>> 92569bd25d8bd5f8b9d7991a39458dce374ae539
 import { UsersService } from './users.service'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
@@ -14,11 +9,7 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard'
 import { RolesGuard } from '../auth/guard/roles.guard'
 import { RequiredRoles } from '../auth/decorator/roles.decorator'
 import { RoleEnum } from '../auth/enum/role.enum'
-<<<<<<< HEAD
 import { ApiBearerAuth, ApiBody, ApiQuery } from '@nestjs/swagger'
-=======
-import { ApiBearerAuth, ApiQuery } from '@nestjs/swagger'
->>>>>>> 92569bd25d8bd5f8b9d7991a39458dce374ae539
 import { CurrentUser } from './dto/user.decorator'
 
 @Controller('users')
@@ -28,12 +19,8 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post()
-<<<<<<< HEAD
+  @ApiBody({ type: CreateUserDto })
   create(@Body() createUserDto: CreateUserDto, @CurrentUser() user: any) {
-=======
-  create(@Body() createUserDto: CreateUserDto,
-  @CurrentUser() user: any) {
->>>>>>> 92569bd25d8bd5f8b9d7991a39458dce374ae539
     createUserDto.role = user.role
     return this.usersService.create(createUserDto)
   }
@@ -50,19 +37,19 @@ export class UsersController {
     const limitNumber = parseInt(limit, 10)
 
     return this.usersService.findAll(pageNumber, limitNumber)
-  }  // 1. password, 2. role,  role ->  enum type
-  // login 
-  // guard
-  // exxtension - nestjs
-  
+  } 
+@Patch(':id/role')
+@ApiBody({ schema: { type: 'object', properties: { role: { type: 'string', enum: Object.values(RoleEnum) } } } })
+  updateRole(@Param('id') id: string, @Body('role') role: string) {
+    return this.usersService.updateRole(+id, role)
+  }
   @Get(':id')
-  @RequiredRoles(RoleEnum.Admin , RoleEnum.User)
-9
+  @RequiredRoles(RoleEnum.Admin, RoleEnum.User)
   findOne(@Param('id') id: string) {
     return this.usersService.findOne(+id)
   }
-  @Patch(':id')
 
+  @Patch(':id')
   @RequiredRoles(RoleEnum.Admin)
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
     return this.usersService.update(+id, updateUserDto)
@@ -73,8 +60,4 @@ export class UsersController {
   remove(@Param('id') id: string) {
     return this.usersService.remove(+id)
   }
-<<<<<<< HEAD
 }
-=======
-}
->>>>>>> 92569bd25d8bd5f8b9d7991a39458dce374ae539
