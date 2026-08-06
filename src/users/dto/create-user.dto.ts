@@ -1,14 +1,10 @@
 import {
-  IsEmail,
   IsNotEmpty,
-  IsNumber,
   IsString,
   Matches,
   MinLength,
   IsOptional,
   MaxLength,
-  Max,
-  Min,
 } from 'class-validator';
 import { RoleEnum } from '../../auth/enum/role.enum';
 
@@ -21,17 +17,6 @@ export class CreateUserDto {
     message: 'Username can only contain letters, numbers, and underscores',
   })
   username!: string;
-
-  @IsNotEmpty()
-  @IsString()
-  @IsEmail()
-  email!: string;
-
-  @IsNumber()
-  @IsNotEmpty()
-  @Min(5, { message: 'You must be at least 6 yo to use our site properly' })
-  @Max(100, { message: 'You must be max 99 yo to use our site properly' })
-  age!: number;
 
   @IsNotEmpty()
   @IsString()

@@ -25,11 +25,12 @@ export class RolesGuard implements CanActivate {
     if (!requiredRoles || requiredRoles.length === 0) {
       return true;
     }
-
+    const role = RoleEnum.Admin || RoleEnum.User;
     const request = context.switchToHttp().getRequest();
     const user = request.user as { role?: RoleEnum } | undefined;
-
-    if (!user?.role || !requiredRoles.includes(user.role)) {
+    // if (!['admin', 'user'].includes(lowerRole)) {
+    const lowerRole = String(role).toLowerCase();
+    if (!user?.role || !requiredRoles.includes(lowerRole as RoleEnum)) {
       this.logger.error(
         `Unauthorized role. Required: ${requiredRoles.join(', ')}`,
       );
@@ -38,6 +39,31 @@ export class RolesGuard implements CanActivate {
       );
     }
     return true;
+  }
+}
+
+@Injectable()
+export class CheckIfAdminGuard implements CanActivate {
+  canActivate(context: ExecutionContext): boolean {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+
+    if (!user) {
+      throw new ForbiddenException('You have to register first');
+    }
+
+    const userRole = user.role ? String(user.role).toLowerCase() : '';
+    const adminRole = String(RoleEnum.Admin).toLowerCase();
+
+    if (userRole === adminRole) {
+      return true;
+    }
+
+    throw new ForbiddenException({
+      message: `You aren't admin, so if you still want to be admin, ask admins to grant you admin as well `,
+      error: ForbiddenException,
+      statuscode: 403,
+    });
   }
 }
 

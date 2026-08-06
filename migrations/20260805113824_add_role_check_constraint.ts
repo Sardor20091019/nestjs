@@ -4,7 +4,7 @@ export async function up(knex: Knex): Promise<void> {
   return knex.raw(`
     ALTER TABLE users 
     ADD CONSTRAINT check_valid_role 
-    CHECK (role IN ('admin', 'user', 'Admin', 'User'));
+    CHECK (lower(role) IN ('admin','user'));
   `);
 }
 

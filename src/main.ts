@@ -17,9 +17,14 @@ async function sardor() {
   SwaggerModule.setup('sardor', app, documentFactory);
 
   app.useGlobalPipes(
-    new ValidationPipe({ whitelist: true, forbidNonWhitelisted: true }),
+    new ValidationPipe({
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transform: true,
+    }),
   );
 
   await app.listen(3000);
+  console.log('Hello');
 }
 void sardor();

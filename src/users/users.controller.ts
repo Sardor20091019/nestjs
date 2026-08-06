@@ -1,15 +1,31 @@
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-import { Controller, Body, Param, UseGuards, Post, Req } from '@nestjs/common';
+import {
+  Controller,
+  Body,
+  Param,
+  UseGuards,
+  Post,
+  Req,
+  ParseIntPipe,
+} from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
-import { RolesGuard } from '../auth/guard/roles.guard';
-import { RequiredRoles } from '../auth/decorator/roles.decorator';
-import { RoleEnum } from '../auth/enum/role.enum';
+import {
+  CheckIfAdminGuard,
+  //  CheckIfAccessingTheIrOwnInfoGuard,
+  RolesGuard,
+} from '../auth/guard/roles.guard';
 import { ApiBearerAuth, ApiBody } from '@nestjs/swagger';
 import { CheckIfAdminOrAccessingTheIrOwnInfoGuard } from '../auth/guard/roles.guard';
 import { PaginationDto } from './dto/pagination.dto';
+import { findbyidDto } from './dto/find-by-id.dto';
+import { setroleDto } from './dto/set-role.dto';
+import { changePasswordDto } from './dto/change-password.dto';
+import { RemoveByIdDto } from './dto/remove-by-id.dto';
+
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
 @ApiBearerAuth()
@@ -22,48 +38,44 @@ export class UsersController {
     return this.usersService.findAll(pagiantionDto.page, pagiantionDto.limit);
   }
 
-  @RequiredRoles(RoleEnum.Admin)
   @Post('set-role')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        id: { type: 'number', example: 1 },
-        role: { type: 'string', enum: Object.values(RoleEnum) },
-      },
-    },
-  })
-  updateRole(@Body() body: { id: number; role: string }) {
-    return this.usersService.updateRole(body);
+  @UseGuards(JwtAuthGuard, CheckIfAdminGuard)
+  @ApiBody({ type: setroleDto })
+  updateRole(@Body() setroleDto: setroleDto) {
+    return this.usersService.updateRole(setroleDto);
   }
 
   @Post('find-by-id')
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        id: { type: 'number', example: 1 },
-      },
-    },
-  })
-  findOne(@Body() body: { id: number }) {
-    return this.usersService.findOne(Number(body.id));
+  @ApiBody({ type: findbyidDto })
+  findOne(@Body() findbyidDto: findbyidDto) {
+    return this.usersService.findOne(findbyidDto.id);
+  }
+
+  @Post('change-my-password')
+  @ApiBody({ type: changePasswordDto })
+  changeMyPassword(
+    @Body() changePasswordDto: changePasswordDto,
+    @Req() req: any,
+  ) {
+    return this.usersService.changeMyPassword(
+      req.user.id,
+      changePasswordDto.password,
+    );
   }
 
   @Post('update/:id')
   @UseGuards(JwtAuthGuard, CheckIfAdminOrAccessingTheIrOwnInfoGuard)
   update(
-    @Param('id') id: string,
+    @Param('id', ParseIntPipe) id: number,
     @Body() updateUserDto: UpdateUserDto,
     @Req() req: any,
   ) {
     const requestingUser = req.user;
-    return this.usersService.update(+id, updateUserDto, requestingUser);
+    return this.usersService.update(id, updateUserDto, requestingUser);
   }
-
-  @Post('remove/:id')
-  @RequiredRoles(RoleEnum.Admin)
-  remove(@Param('id') id: string) {
-    return this.usersService.remove(+id);
+  @Post('remove')
+  @UseGuards(JwtAuthGuard, CheckIfAdminGuard)
+  remove(@Body() RemoveByIdDto: RemoveByIdDto) {
+    return this.usersService.remove(RemoveByIdDto.id, RemoveByIdDto);
   }
 }

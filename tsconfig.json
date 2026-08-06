@@ -21,7 +21,7 @@
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false
-   },
+   }, 
   "include": ["knexfile.ts",
     "src/**/*.ts",
     "src/**/*.js",

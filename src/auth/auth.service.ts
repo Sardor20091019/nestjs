@@ -21,7 +21,7 @@ export class AuthService {
   ) {}
 
   async register(createUserDto: any) {
-    const username = createUserDto.username || createUserDto.name;
+    const username = createUserDto.username;
 
     const existingUser = await this.usersService.findByUsername(username);
     if (existingUser) {

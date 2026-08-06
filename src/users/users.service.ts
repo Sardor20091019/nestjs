@@ -10,6 +10,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UserRepo } from './users.repo';
 import * as bcrypt from 'bcrypt';
+import { RemoveByIdDto } from './dto/remove-by-id.dto';
 
 @Injectable()
 export class UsersService {
@@ -27,11 +28,7 @@ export class UsersService {
       });
     }
 
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(
-      createUserDto.password,
-      saltRounds,
-    );
+    const hashedPassword = await bcrypt.hash(createUserDto.password, 10);
     const userWithHashedPassword = {
       ...createUserDto,
       password: hashedPassword,
@@ -70,32 +67,27 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: any, requestingUser: any) {
-    if (updateUserDto.role) {
+    if (!updateUserDto.role) {
       const requesterRole = requestingUser?.role
         ? String(requestingUser.role).toLowerCase()
         : '';
-      const adminRole = 'admin';
 
-      if (requesterRole !== adminRole) {
-        throw new ForbiddenException(
-          'Only administrators can change user roles.',
-        );
+      if (requesterRole !== 'admin') {
+        throw new ForbiddenException('Only admins can change user roles.');
       }
     }
 
-    if (updateUserDto.password) {
-      const saltRounds = 10;
-      updateUserDto.password = await bcrypt.hash(
-        updateUserDto.password,
-        saltRounds,
-      );
-    }
-
-    const currentUserId = requestingUser?.id ?? requestingUser?.sub;
+    const currentUserId = requestingUser?.id;
 
     return this.repo.update(id, updateUserDto, currentUserId);
   }
-  async remove(id: number) {
+
+  async changeMyPassword(id: number, newPassword: string) {
+    return this.repo.changePassword(id, newPassword);
+  }
+
+  async remove(id: number, RemoveByIdDto: RemoveByIdDto) {
+    console.log(RemoveByIdDto);
     return await this.repo.remove(id);
   }
 }
