@@ -14,9 +14,6 @@ import { RemoveByIdDto } from './dto/remove-by-id.dto';
 
 @Injectable()
 export class UsersService {
-  async findById(id: number) {
-    return this.repo.findOne(id);
-  }
   constructor(private readonly repo: UserRepo) {}
 
   async create(createUserDto: CreateUserDto) {

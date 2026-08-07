@@ -69,7 +69,7 @@ export class AuthService {
 
     const accessToken = this.jwtService.sign(payload, {
       secret: process.env.JWT_ACCESS_SECRET,
-      expiresIn: '10m',
+      expiresIn: '30s',
     });
 
     const refreshToken = this.jwtService.sign(refreshPayload, {
@@ -96,7 +96,7 @@ export class AuthService {
         secret: process.env.JWT_REFRESH_SECRET,
       });
 
-      const user = await this.usersService.findById(payload.id);
+      const user = await this.usersService.findOne(payload.id);
       if (!user.hashedRefreshToken) {
         throw new UnauthorizedException('Access Denied');
       }
