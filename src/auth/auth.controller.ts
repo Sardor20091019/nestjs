@@ -27,10 +27,7 @@ export class AuthController {
     return this.authService.login(user);
   }
   @Post('refresh')
-  async refresh(@Body() body: { refreshToken: string }) {
-    if (!body.refreshToken) {
-      throw new UnauthorizedException('Invalid credentials');
-    }
-    return this.authService.refreshTokens(body.refreshToken);
+  async refresh(@Body() dto: RefreshTokenDto) {
+    return this.authService.refreshTokens(dto.refreshToken);
   }
 }
