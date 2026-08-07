@@ -14,6 +14,9 @@ import { RemoveByIdDto } from './dto/remove-by-id.dto';
 
 @Injectable()
 export class UsersService {
+  async findById(id: number) {
+    return this.repo.findOne(id);
+  }
   constructor(private readonly repo: UserRepo) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -37,7 +40,9 @@ export class UsersService {
     const newUser = await this.repo.create(userWithHashedPassword);
     return newUser;
   }
-
+  updateRefreshToken(id: number, hashedRefreshToken: string) {
+    return this.repo.updateRefreshToken(id, hashedRefreshToken);
+  }
   async findAll(page: number, limit: number) {
     const { data, total } = await this.repo.list(page, limit);
 

@@ -56,20 +56,67 @@ export class AuthService {
     return result;
   }
 
-  login(user: any) {
+  async login(user: any) {
     const payload = {
       id: user.id,
       username: user.username,
       role: user.role,
     };
-    const token = this.jwtService.sign(payload);
+
+    const refreshPayload = {
+      id: user.id,
+    };
+
+    const accessToken = this.jwtService.sign(payload, {
+      secret: process.env.JWT_ACCESS_SECRET,
+      expiresIn: '60s',
+    });
+
+    const refreshToken = this.jwtService.sign(refreshPayload, {
+      secret: process.env.JWT_REFRESH_SECRET,
+      expiresIn: '7d',
+    });
+
+    await this.updateRefreshTokenHash(user.id, refreshToken);
+
     return {
-      access_token: this.jwtService.sign(payload),
+      access_token: accessToken,
+      refresh_token: refreshToken,
       user: {
         id: user.id,
         username: user.username,
         role: user.role,
       },
     };
+  }
+
+  async refreshTokens(refreshToken: string) {
+    try {
+      const payload: any = this.jwtService.verify(refreshToken, {
+        secret: process.env.JWT_REFRESH_SECRET,
+      });
+
+      const user = await this.usersService.findById(payload.id);
+      if (!user || !user.hashedRefreshToken) {
+        throw new UnauthorizedException('Access Denied');
+      }
+
+      const refreshTokenMatches = await bcrypt.compare(
+        refreshToken,
+        user.hashedRefreshToken,
+      );
+      if (!refreshTokenMatches) {
+        throw new UnauthorizedException('Access Denied');
+      }
+
+      return this.login(user);
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+  }
+
+  async updateRefreshTokenHash(userId: number, refreshToken: string) {
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.usersService.updateRefreshToken(userId, hashedRefreshToken);
   }
 }

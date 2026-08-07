@@ -149,6 +149,11 @@ export class UserRepo {
       };
     });
   }
+  async updateRefreshToken(id: number, hashedRefreshToken: string) {
+    return db1(this.tableName)
+      .where({ id })
+      .update({ hashed_refresh_token: hashedRefreshToken });
+  }
   async remove(id: number) {
     const deletedRows = await db1(this.tableName).where({ id }).delete();
     return deletedRows > 0

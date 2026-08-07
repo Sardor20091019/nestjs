@@ -2,6 +2,7 @@
 import { Controller, Post, Body, UnauthorizedException } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/sign-user.dto';
+import { RefreshTokenDto } from './dto/refresh-token.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -24,5 +25,12 @@ export class AuthController {
     }
 
     return this.authService.login(user);
+  }
+  @Post('refresh')
+  async refresh(@Body() body: { refreshToken: string }) {
+    if (!body.refreshToken) {
+      throw new UnauthorizedException('Invalid credentials');
+    }
+    return this.authService.refreshTokens(body.refreshToken);
   }
 }
