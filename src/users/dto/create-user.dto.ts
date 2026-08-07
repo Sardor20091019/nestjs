@@ -3,10 +3,10 @@ import {
   IsString,
   Matches,
   MinLength,
-  IsOptional,
+  // IsOptional,
   MaxLength,
 } from 'class-validator';
-import { RoleEnum } from '../../auth/enum/role.enum';
+// import { RoleEnum } from '../../auth/enum/role.enum';
 
 export class CreateUserDto {
   @IsNotEmpty()
@@ -22,7 +22,4 @@ export class CreateUserDto {
   @IsString()
   @MinLength(6, { message: 'Password must be at least 6 characters long' })
   password!: string;
-
-  @IsOptional()
-  role!: RoleEnum.User | RoleEnum.Admin;
 }

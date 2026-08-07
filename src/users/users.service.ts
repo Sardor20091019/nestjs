@@ -50,7 +50,7 @@ export class UsersService {
     };
   }
 
-  async updateRole(params: { id: number; role: string }) {
+  async updateRole(params: { id: number; role: number }) {
     const { role, id } = params;
     const updatedUser = await this.repo.updateRole(id, role);
     return updatedUser;
@@ -68,11 +68,9 @@ export class UsersService {
 
   async update(id: number, updateUserDto: any, requestingUser: any) {
     if (!updateUserDto.role) {
-      const requesterRole = requestingUser?.role
-        ? String(requestingUser.role).toLowerCase()
-        : '';
+      const requesterRole = requestingUser?.role;
 
-      if (requesterRole !== 'admin') {
+      if (requesterRole !== 1) {
         throw new ForbiddenException('Only admins can change user roles.');
       }
     }
@@ -87,7 +85,7 @@ export class UsersService {
   }
 
   async remove(id: number, RemoveByIdDto: RemoveByIdDto) {
-    console.log(RemoveByIdDto);
+    console.log(`${RemoveByIdDto.id} is removed from table`);
     return await this.repo.remove(id);
   }
 }

@@ -20,7 +20,6 @@ async function sardor() {
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
-      transform: true,
     }),
   );
 

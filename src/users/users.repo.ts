@@ -6,7 +6,7 @@
 import {
   BadRequestException,
   Injectable,
-  // InternalServerErrorException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { db1 } from '../shared/db';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -46,12 +46,13 @@ export class UserRepo {
     };
   }
 
-  async updateRole(id: number, role: string) {
+  async updateRole(id: number, role: number) {
     const lowerRole = String(role).toLowerCase();
     if (!['admin', 'user'].includes(lowerRole)) {
       throw new BadRequestException({
         statuscode: 400,
-        message: "role must be either admin or user, and mustn't be left empty",
+        message:
+          "role must be either 1(admin) or 2(user), and mustn't be left empty",
         error: 'Bad Request',
       });
     }
@@ -86,12 +87,12 @@ export class UserRepo {
         new_values: JSON.stringify(updatedUser),
         created_by: createdById || null,
       });
-      // throw new InternalServerErrorException({
-      //   message:
-      //     'Error happened during transactions is working, so now task will stop now and rollback shouyld work, so the part you wanted to update is still hols the old value, and your new value isnt saved because of InternalServerException',
-      //   statuscode: 500,
-      //   error: InternalServerErrorException,
-      //
+      throw new InternalServerErrorException({
+        message:
+          'Error happened during transactions is working, so now task will stop now and rollback shouyld work, so the part you wanted to update is still hols the old value, and your new value isnt saved because of InternalServerException',
+        statuscode: 500,
+        error: InternalServerErrorException,
+      });
       return updatedUser;
     });
   }
