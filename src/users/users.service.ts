@@ -67,15 +67,19 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: any, requestingUser: any) {
-    if (!updateUserDto.role) {
-      const requesterRole = requestingUser?.role;
+    const currentUserId = requestingUser?.id;
+    const requesterRole = requestingUser?.role;
 
-      if (requesterRole !== 1) {
-        throw new ForbiddenException('Only admins can change user roles.');
-      }
+    const isAdmin = requesterRole === 1;
+    const isSelf = currentUserId === id;
+
+    if (!isAdmin && !isSelf) {
+      throw new ForbiddenException('You can only update your own record.');
     }
 
-    const currentUserId = requestingUser?.id;
+    if (updateUserDto.role && !isAdmin) {
+      throw new ForbiddenException('Only admins can change user roles.');
+    }
 
     return this.repo.update(id, updateUserDto, currentUserId);
   }
@@ -85,7 +89,7 @@ export class UsersService {
   }
 
   async remove(id: number, RemoveByIdDto: RemoveByIdDto) {
-    console.log(`${RemoveByIdDto.id} is removed from table`);
+    console.log(RemoveByIdDto);
     return await this.repo.remove(id);
   }
 }

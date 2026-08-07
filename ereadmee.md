@@ -24,15 +24,13 @@ POST http://localhost:3000/auth/login ishlavatti
 
 POST http://localhost:3000/users/users-list ishlavatti
 
-POST http://localhost:3000/users/set-role ishlavatti
+POST http://localhost:3000/users/set-role not working
 
 POST http://localhost:3000/users/find-by-id ishlavatti 
 
 POST http://localhost:3000/users/change-my-password ishlavatti
 
-POST http://localhost:3000/users/update/{id} 
-
-BUG not working
+POST http://localhost:3000/users/update/{id} ishlavatti
 
 POST http://localhost:3000/users/remove/{id} ishlavatti
 

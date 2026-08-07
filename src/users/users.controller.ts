@@ -25,6 +25,7 @@ import { findbyidDto } from './dto/find-by-id.dto';
 import { setroleDto } from './dto/set-role.dto';
 import { changePasswordDto } from './dto/change-password.dto';
 import { RemoveByIdDto } from './dto/remove-by-id.dto';
+import { ThrottlerGuard } from '@nestjs/throttler';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard, RolesGuard)
@@ -33,12 +34,14 @@ export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
   @Post('users-list')
+  @UseGuards(ThrottlerGuard)
   @ApiBody({ type: PaginationDto })
   findAll(@Body() pagiantionDto: PaginationDto) {
     return this.usersService.findAll(pagiantionDto.page, pagiantionDto.limit);
   }
 
   @Post('set-role')
+  @UseGuards(ThrottlerGuard)
   @UseGuards(JwtAuthGuard, CheckIfAdminGuard)
   @ApiBody({ type: setroleDto })
   updateRole(@Body() setroleDto: setroleDto) {
@@ -46,12 +49,14 @@ export class UsersController {
   }
 
   @Post('find-by-id')
+  @UseGuards(ThrottlerGuard)
   @ApiBody({ type: findbyidDto })
   findOne(@Body() findbyidDto: findbyidDto) {
     return this.usersService.findOne(findbyidDto.id);
   }
 
   @Post('change-my-password')
+  @UseGuards(ThrottlerGuard)
   @ApiBody({ type: changePasswordDto })
   changeMyPassword(
     @Body() changePasswordDto: changePasswordDto,
@@ -64,6 +69,7 @@ export class UsersController {
   }
 
   @Post('update/:id')
+  @UseGuards(ThrottlerGuard)
   @UseGuards(JwtAuthGuard, CheckIfAdminOrAccessingTheIrOwnInfoGuard)
   update(
     @Param('id', ParseIntPipe) id: number,
@@ -74,6 +80,7 @@ export class UsersController {
     return this.usersService.update(id, updateUserDto, requestingUser);
   }
   @Post('remove')
+  @UseGuards(ThrottlerGuard)
   @UseGuards(JwtAuthGuard, CheckIfAdminGuard)
   remove(@Body() RemoveByIdDto: RemoveByIdDto) {
     return this.usersService.remove(RemoveByIdDto.id, RemoveByIdDto);

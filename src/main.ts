@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
+import helmet from 'helmet';
+import { HttpExceptionFilter } from './http-exception.filter';
 
 async function sardor() {
   const app = await NestFactory.create(AppModule);
@@ -20,9 +22,15 @@ async function sardor() {
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
+      transform: true,
+      transformOptions: {
+        enableImplicitConversion: true,
+      },
     }),
   );
 
+  app.useGlobalFilters(new HttpExceptionFilter());
+  app.use(helmet());
   await app.listen(3000);
   console.log('Hello');
 }

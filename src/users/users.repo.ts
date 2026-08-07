@@ -6,6 +6,7 @@
 import {
   BadRequestException,
   Injectable,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   InternalServerErrorException,
 } from '@nestjs/common';
 import { db1 } from '../shared/db';
@@ -68,7 +69,6 @@ export class UserRepo {
     const user = await db1(this.tableName).where({ id }).first();
     return user;
   }
-
   async update(id: number, updateUserDto: UpdateUserDto, createdById?: number) {
     return db1.transaction(async (trx) => {
       const oldValues = await trx(this.tableName).where({ id }).first();
@@ -81,18 +81,23 @@ export class UserRepo {
         .update(updateUserDto)
         .returning('*');
 
+      const changedOld: Record<string, any> = {};
+      const changedNew: Record<string, any> = {};
+
+      for (const key of Object.keys(updateUserDto)) {
+        if (oldValues[key] !== updatedUser[key]) {
+          changedOld[key] = oldValues[key];
+          changedNew[key] = updatedUser[key];
+        }
+      }
+
       await trx('user_changes').insert({
         main_id: id,
-        old_values: JSON.stringify(oldValues),
-        new_values: JSON.stringify(updatedUser),
+        old_values: JSON.stringify(changedOld),
+        new_values: JSON.stringify(changedNew),
         created_by: createdById || null,
       });
-      throw new InternalServerErrorException({
-        message:
-          'Error happened during transactions is working, so now task will stop now and rollback shouyld work, so the part you wanted to update is still hols the old value, and your new value isnt saved because of InternalServerException',
-        statuscode: 500,
-        error: InternalServerErrorException,
-      });
+
       return updatedUser;
     });
   }
